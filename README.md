@@ -303,3 +303,6 @@ Apache License 2.0. See LICENSE.
 ## Project
 
 https://github.com/aakashsenthilkumaar02-tech/lifegrid-2.0
+
+## Prototype URL:
+https://lifegridai-313604834008.asia-southeast1.run.app/
