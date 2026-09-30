@@ -5,7 +5,7 @@
 
 import express from 'express';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath} from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenAI, Type } from '@google/genai';
 import { runSimulation } from './src/lib/simulator.js';
@@ -16,13 +16,10 @@ import {
   ScenarioDefinition,
   SessionState,
 } from './src/types/lifegrid.js';
-
-dotenv.config();
-
-// server.ts is an ES module, so __dirname is not available by default.
-// Resolve the current file directory explicitly so production/Cloud Run can serve dist/ reliably.
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -473,6 +470,6 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(distPath, 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`LIFEGRID AI Server running on port ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`LIFEGRID AI Server running on 0.0.0.0:${PORT}`);
 });
