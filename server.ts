@@ -22,7 +22,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT || 3001);
 
 app.use(express.json());
 
@@ -54,7 +54,8 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'healthy',
     engine: 'LIFEGRID Deterministic Cascade Engine',
-    version: '1.0.0',
+    version: '2.0.0',
+    uptime_seconds: Math.round(process.uptime()),
     gemini_connected: !!process.env.GEMINI_API_KEY,
   });
 });
