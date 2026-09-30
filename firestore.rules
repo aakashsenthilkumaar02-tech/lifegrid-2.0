@@ -1,0 +1,77 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Default Deny Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['id', 'email'])
+        && data.id is string && data.id == request.auth.uid
+        && data.email is string && data.email.size() <= 256;
+    }
+
+    function isValidScenario(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'failure_asset_id', 'duration_hours', 'severity'])
+        && data.id is string && data.id.size() <= 128
+        && data.userId is string && data.userId == userId
+        && data.failure_asset_id is string && data.failure_asset_id.size() <= 64
+        && data.duration_hours is number && data.duration_hours >= 0
+        && data.severity is number && data.severity >= 0 && data.severity <= 1;
+    }
+
+    function isValidIntervention(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'type', 'target_asset_id'])
+        && data.id is string && data.id.size() <= 128
+        && data.userId is string && data.userId == userId
+        && data.type is string && data.type.size() <= 64
+        && data.target_asset_id is string && data.target_asset_id.size() <= 64;
+    }
+
+    // User profile documents
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && isValidUser(incoming()) && incoming().id == existing().id;
+      allow delete: if isOwner(userId);
+
+      // User Scenarios Subcollection
+      match /scenarios/{scenarioId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(scenarioId) && isValidScenario(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(scenarioId) && isValidScenario(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(scenarioId);
+      }
+
+      // User Interventions Subcollection
+      match /interventions/{interventionId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(interventionId) && isValidIntervention(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(interventionId) && isValidIntervention(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(interventionId);
+      }
+    }
+  }
+}

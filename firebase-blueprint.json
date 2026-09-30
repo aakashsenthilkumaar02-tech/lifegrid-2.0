@@ -1,0 +1,142 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Registered emergency manager or grid infrastructure operator profile.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique Firebase Auth User UID."
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Full name or operator callsign."
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "Operator avatar URL."
+        },
+        "role": {
+          "type": "string",
+          "description": "Operator role (e.g. disaster_commander, grid_operator, analyst)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Profile registration timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last profile update timestamp."
+        }
+      },
+      "required": ["id", "email"]
+    },
+    "Scenario": {
+      "title": "Scenario",
+      "description": "Saved infrastructure failure cascade simulation scenario.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Scenario ID."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Author UID."
+        },
+        "title": {
+          "type": "string",
+          "description": "Scenario title."
+        },
+        "failure_asset_id": {
+          "type": "string",
+          "description": "Root failure asset ID."
+        },
+        "duration_hours": {
+          "type": "number",
+          "description": "Failure duration in hours."
+        },
+        "severity": {
+          "type": "number",
+          "description": "Failure severity from 0.0 to 1.0."
+        },
+        "population_exposed": {
+          "type": "number",
+          "description": "Calculated population exposed."
+        },
+        "critical_facilities_affected": {
+          "type": "number",
+          "description": "Count of affected critical health/emergency facilities."
+        },
+        "cascade_depth": {
+          "type": "number",
+          "description": "Maximum cascade hops."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp."
+        }
+      },
+      "required": ["id", "userId", "failure_asset_id", "duration_hours", "severity"]
+    },
+    "Intervention": {
+      "title": "Intervention",
+      "description": "Deployed or planned counterfactual emergency intervention.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Intervention ID."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Operator UID who dispatched intervention."
+        },
+        "scenarioId": {
+          "type": "string",
+          "description": "Associated scenario ID."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of intervention."
+        },
+        "target_asset_id": {
+          "type": "string",
+          "description": "Target infrastructure asset node ID."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of intervention logistics."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Deployment timestamp."
+        }
+      },
+      "required": ["id", "userId", "type", "target_asset_id"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles restricted to owner."
+    },
+    "/users/{userId}/scenarios/{scenarioId}": {
+      "schema": "Scenario",
+      "description": "User saved failure simulation scenarios."
+    },
+    "/users/{userId}/interventions/{interventionId}": {
+      "schema": "Intervention",
+      "description": "User tested counterfactual interventions."
+    }
+  }
+}
