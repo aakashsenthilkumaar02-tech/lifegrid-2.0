@@ -1,8 +1,13 @@
+.env
+.env.*
+!.env.example
 node_modules/
-build/
 dist/
 coverage/
+build/
+.gmp_cache/
 .DS_Store
 *.log
-.env*
-!.env.example
+*.local
+.vscode/
+.idea/
