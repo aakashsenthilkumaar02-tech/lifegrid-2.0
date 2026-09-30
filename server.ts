@@ -5,6 +5,7 @@
 
 import express from 'express';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenAI, Type } from '@google/genai';
 import { runSimulation } from './src/lib/simulator.js';
@@ -17,6 +18,11 @@ import {
 } from './src/types/lifegrid.js';
 
 dotenv.config();
+
+// server.ts is an ES module, so __dirname is not available by default.
+// Resolve the current file directory explicitly so production/Cloud Run can serve dist/ reliably.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
